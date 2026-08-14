@@ -238,8 +238,17 @@
     const DATA_KEY = 'ig_autoreply_data_v2';
     const SETTINGS_KEY = 'ig_autoreply_settings_v2';
 
+    const DEFAULT_BACKEND_URL = 'https://instagram-automation-backend-f416.onrender.com';
+
     function loadSettings() {
-      try { return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {}; } catch { return {}; }
+      let s = {};
+      try { s = JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {}; } catch {}
+      return {
+        backendUrl: s.backendUrl || DEFAULT_BACKEND_URL,
+        apiKey: s.apiKey || '',
+        replyMessage: s.replyMessage || 'Thanks for watching!',
+        maxComments: s.maxComments || 50
+      };
     }
     function saveSettings(s) { localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }
     function loadData() {
