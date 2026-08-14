@@ -5,285 +5,433 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Instagram Auto-Reply Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { font-family: 'Inter', sans-serif; }
-    body { background: #0a0a0f; }
-    .card { background: #13131a; border: 1px solid #1e1e2a; }
-    .card-hover:hover { border-color: #2a2a3a; background: #16161e; }
-    .input { background: #0f0f16; border: 1px solid #1e1e2a; }
-    .input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.15); outline: none; }
-    .btn-primary { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
-    .btn-primary:hover { background: linear-gradient(135deg, #5558e3, #7c4ef0); }
-    .btn-ghost { background: #1a1a24; }
-    .btn-ghost:hover { background: #22222e; }
+    body { background: #050507; color: #f1f1f4; }
+    .card { background: #111118; border: 1px solid #1e1e2a; }
+    .card-hover:hover { border-color: #2e2e3f; background: #16161e; }
+    .input { background: #0a0a0f; border: 1px solid #1e1e2a; color: #f1f1f4; }
+    .input:focus { border-color: #6366f1; outline: none; box-shadow: 0 0 0 3px rgba(99,102,241,0.12); }
+    .btn-primary { background: linear-gradient(135deg, #6366f1, #7c3aed); }
+    .btn-primary:hover { background: linear-gradient(135deg, #5558e3, #6d28d9); }
+    .btn-ghost { background: #181822; border: 1px solid #1e1e2a; }
+    .btn-ghost:hover { background: #22222d; }
+    .sidebar-item { color: #9ca3af; border-radius: 0.5rem; transition: all .15s; }
+    .sidebar-item:hover, .sidebar-item.active { background: #1a1a24; color: #f1f1f4; }
     .accent { color: #8b5cf6; }
     .stat-num { font-weight: 800; letter-spacing: -0.02em; }
-    .fade-in { animation: fadeIn 0.3s ease-out; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    .live-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 8px #22c55e; animation: pulse 2s infinite; }
-    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+    .fade-in { animation: fadeIn .3s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .pulse { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+    .hidden-section { display: none; }
+    .visible-section { display: block; }
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: #3a3a4a; }
-    .divider { border-top: 1px solid #1e1e2a; }
-    .tag { background: #1a1a24; border: 1px solid #2a2a3a; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 10px #22c55e; }
+    .status-dot.off { background: #ef4444; box-shadow: none; }
+    .log-line { border-left: 3px solid #6366f1; }
   </style>
 </head>
-<body class="text-gray-100 min-h-screen">
+<body class="min-h-screen flex">
 
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
-
-    <!-- Header -->
-    <header class="flex items-center justify-between mb-10">
-      <div class="flex items-center gap-4">
-        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <rect x="3" y="3" width="18" height="18" rx="5"/>
-            <circle cx="12" cy="12" r="4"/>
-            <circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>
-          </svg>
+  <!-- Sidebar -->
+  <aside class="w-64 card border-y-0 border-l-0 min-h-screen p-5 hidden lg:flex flex-col justify-between fixed left-0 top-0 h-full z-20">
+    <div>
+      <div class="flex items-center gap-3 mb-10">
+        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/></svg>
         </div>
-        <div>
-          <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">Instagram Auto-Reply</h1>
-          <p class="text-gray-500 text-sm">Comment automation dashboard</p>
-        </div>
+        <span class="font-bold text-lg">AutoReply</span>
       </div>
-      <div class="flex items-center gap-2 card px-3.5 py-2 rounded-full">
-        <span class="live-dot"></span>
-        <span class="text-sm font-medium text-gray-300">Live</span>
+
+      <nav class="space-y-1">
+        <a href="#" data-page="dashboard" class="sidebar-item active flex items-center gap-3 px-4 py-3 text-sm font-medium">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          Dashboard
+        </a>
+        <a href="#" data-page="run" class="sidebar-item flex items-center gap-3 px-4 py-3 text-sm font-medium">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Manual Run
+        </a>
+        <a href="#" data-page="activity" class="sidebar-item flex items-center gap-3 px-4 py-3 text-sm font-medium">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Activity
+        </a>
+        <a href="#" data-page="settings" class="sidebar-item flex items-center gap-3 px-4 py-3 text-sm font-medium">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          Settings
+        </a>
+      </nav>
+    </div>
+    <div class="text-xs text-gray-600">
+      Manual Instagram auto-reply<br/>No database required
+    </div>
+  </aside>
+
+  <!-- Mobile nav -->
+  <div class="lg:hidden fixed top-0 left-0 w-full card border-x-0 border-t-0 z-20 px-4 py-3 flex items-center justify-between">
+    <span class="font-bold">AutoReply</span>
+    <button id="menu-toggle" class="btn-ghost px-3 py-1.5 rounded-lg text-sm">Menu</button>
+  </div>
+  <div id="mobile-menu" class="lg:hidden fixed top-14 left-0 w-full card border-x-0 border-t-0 hidden z-20 px-4 pb-4">
+    <nav class="space-y-1">
+      <a href="#" data-page="dashboard" class="sidebar-item active block px-4 py-3 text-sm">Dashboard</a>
+      <a href="#" data-page="run" class="sidebar-item block px-4 py-3 text-sm">Manual Run</a>
+      <a href="#" data-page="activity" class="sidebar-item block px-4 py-3 text-sm">Activity</a>
+      <a href="#" data-page="settings" class="sidebar-item block px-4 py-3 text-sm">Settings</a>
+    </nav>
+  </div>
+
+  <!-- Main -->
+  <main class="lg:ml-64 flex-1 p-4 lg:p-8 pt-16 lg:pt-8">
+
+    <!-- Top bar -->
+    <header class="flex items-center justify-between mb-8">
+      <div>
+        <h1 id="page-title" class="text-2xl font-bold">Dashboard</h1>
+        <p id="page-subtitle" class="text-gray-500 text-sm mt-1">Overview and stats</p>
+      </div>
+      <div class="flex items-center gap-2 card px-3 py-1.5 rounded-full text-sm">
+        <span id="status-dot" class="status-dot off"></span>
+        <span id="status-text" class="text-gray-400">Not connected</span>
       </div>
     </header>
 
-    <!-- Stats -->
-    <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-      <div class="card rounded-2xl p-5 transition card-hover">
-        <div class="text-xs uppercase tracking-wider text-gray-500 mb-2 font-medium">Media Tracked</div>
-        <div class="stat-num text-3xl" id="stat-media">0</div>
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="visible-section fade-in">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="card rounded-2xl p-5 card-hover">
+          <div class="text-xs uppercase tracking-wider text-gray-500 font-medium mb-2">Media Tracked</div>
+          <div class="stat-num text-3xl" id="dash-media">0</div>
+        </div>
+        <div class="card rounded-2xl p-5 card-hover">
+          <div class="text-xs uppercase tracking-wider text-gray-500 font-medium mb-2">Comments Seen</div>
+          <div class="stat-num text-3xl" id="dash-comments">0</div>
+        </div>
+        <div class="card rounded-2xl p-5 card-hover">
+          <div class="text-xs uppercase tracking-wider text-gray-500 font-medium mb-2">Replies Sent</div>
+          <div class="stat-num text-3xl text-green-400" id="dash-replied">0</div>
+        </div>
+        <div class="card rounded-2xl p-5 card-hover">
+          <div class="text-xs uppercase tracking-wider text-gray-500 font-medium mb-2">Reply Message</div>
+          <div class="text-sm text-gray-300 truncate" id="dash-reply">Not set</div>
+        </div>
       </div>
-      <div class="card rounded-2xl p-5 transition card-hover">
-        <div class="text-xs uppercase tracking-wider text-gray-500 mb-2 font-medium">Comments Seen</div>
-        <div class="stat-num text-3xl" id="stat-comments">0</div>
-      </div>
-      <div class="card rounded-2xl p-5 transition card-hover">
-        <div class="text-xs uppercase tracking-wider text-gray-500 mb-2 font-medium">Replies Sent</div>
-        <div class="stat-num text-3xl text-green-400" id="stat-replied">0</div>
-      </div>
-      <div class="card rounded-2xl p-5 transition card-hover">
-        <div class="text-xs uppercase tracking-wider text-gray-500 mb-2 font-medium">Interval (min)</div>
-        <div class="stat-num text-3xl accent" id="stat-interval">5</div>
+
+      <div class="grid lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 card rounded-2xl p-6">
+          <h3 class="font-bold mb-4">Recent Activity</h3>
+          <div id="dash-activity" class="space-y-3 max-h-80 overflow-y-auto">
+            <p class="text-gray-600 text-sm">No activity yet. Run the backend to see replies.</p>
+          </div>
+        </div>
+        <div class="card rounded-2xl p-6">
+          <h3 class="font-bold mb-4">Quick Actions</h3>
+          <div class="space-y-3">
+            <button onclick="showPage('run')" class="btn-primary w-full py-3 rounded-xl font-semibold text-sm">Run Now</button>
+            <button onclick="showPage('settings')" class="btn-ghost w-full py-3 rounded-xl font-medium text-sm">Configure Backend</button>
+          </div>
+        </div>
       </div>
     </section>
 
-    <div class="grid lg:grid-cols-5 gap-6">
+    <!-- RUN -->
+    <section id="run" class="hidden-section fade-in">
+      <div class="max-w-2xl">
+        <div class="card rounded-2xl p-6 mb-6">
+          <h3 class="font-bold text-lg mb-1">Manual Run</h3>
+          <p class="text-gray-500 text-sm mb-6">Trigger the backend once to reply to new comments.</p>
 
-      <!-- Settings -->
-      <section class="lg:col-span-2 card rounded-2xl p-6">
-        <h2 class="text-lg font-bold mb-1">Settings</h2>
-        <p class="text-gray-500 text-sm mb-6">Configure your auto-reply behavior</p>
+          <div class="space-y-5">
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">Reply Message</label>
+              <textarea id="run-reply" rows="3" placeholder="Thanks for watching!"
+                class="input w-full rounded-xl px-4 py-3 text-sm resize-none"></textarea>
+              <p class="text-xs text-gray-600 mt-1.5">This message is sent to each new comment.</p>
+            </div>
 
-        <div class="space-y-5">
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Reply Message</label>
-            <textarea id="reply-msg" rows="3" placeholder="Thanks for watching!"
-              class="input w-full rounded-xl px-4 py-3 text-sm resize-none transition"></textarea>
-            <p class="text-xs text-gray-600 mt-1.5">Sent to every new comment on your reels</p>
-          </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">Max Replies This Run</label>
+              <input type="number" id="run-max" min="1" max="100" value="50"
+                class="input w-full rounded-xl px-4 py-3 text-sm">
+            </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Check Interval</label>
-            <div class="relative">
-              <input type="number" id="interval-input" min="1" max="60" value="5"
-                class="input w-full rounded-xl px-4 py-3 text-sm transition pr-16">
-              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">min</span>
+            <button id="btn-run" class="btn-primary w-full py-3.5 rounded-xl font-semibold text-sm transition-all">
+              <span id="run-text">Run Auto-Reply</span>
+            </button>
+
+            <div id="run-result" class="hidden card rounded-xl p-4 border-l-4 border-l-indigo-500">
+              <h4 class="font-semibold text-sm mb-2" id="run-status">Ready</h4>
+              <p class="text-sm text-gray-400" id="run-detail">Click Run to start.</p>
             </div>
           </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Max Replies Per Run</label>
-            <input type="number" id="max-input" min="1" max="100" value="50"
-              class="input w-full rounded-xl px-4 py-3 text-sm transition">
-          </div>
-
-          <button id="save-btn"
-            class="btn-primary w-full py-3 rounded-xl font-semibold text-white transition-all shadow-lg shadow-indigo-500/20">
-            Save Settings
-          </button>
-
-          <div id="save-toast" class="hidden bg-green-500/10 border border-green-500/30 text-green-400 text-sm rounded-xl px-4 py-3 text-center font-medium">
-            Settings saved successfully
-          </div>
         </div>
-      </section>
-
-      <!-- Activity Feed -->
-      <section class="lg:col-span-3 card rounded-2xl p-6">
-        <div class="flex items-center justify-between mb-1">
-          <h2 class="text-lg font-bold">Recent Activity</h2>
-          <button id="clear-btn" class="btn-ghost text-xs px-3 py-1.5 rounded-lg transition text-gray-400">
-            Clear All
-          </button>
-        </div>
-        <p class="text-gray-500 text-sm mb-5">Latest comments and their auto-replies</p>
-
-        <div id="feed" class="space-y-3 max-h-[480px] overflow-y-auto pr-1">
-          <div class="text-center py-16" id="empty-state">
-            <div class="text-gray-600 mb-3">
-              <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M20 13c0 4-3.5 7-8 7s-8-3-8-7M12 4v9m0 0l-3-3m3 3l3-3"/>
-              </svg>
-            </div>
-            <p class="text-gray-500 text-sm">No activity yet</p>
-            <p class="text-gray-600 text-xs mt-1">Run the backend to see replies here</p>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <!-- Manual Test -->
-    <section class="card rounded-2xl p-6 mt-6">
-      <h2 class="text-lg font-bold mb-1">Add Test Entry</h2>
-      <p class="text-gray-500 text-sm mb-5">Manually add a comment to preview the dashboard</p>
-      <div class="grid sm:grid-cols-4 gap-3">
-        <input id="test-user" type="text" placeholder="Username"
-          class="input rounded-xl px-4 py-2.5 text-sm transition">
-        <input id="test-comment" type="text" placeholder="Comment text"
-          class="input rounded-xl px-4 py-2.5 text-sm transition sm:col-span-2">
-        <button id="add-test" class="btn-ghost py-2.5 rounded-xl font-medium text-sm transition text-gray-200">
-          Add Entry
-        </button>
       </div>
-      <p class="text-xs text-gray-600 mt-3">When new data arrives, only the latest 50 entries are kept — old data is replaced automatically.</p>
     </section>
 
-    <footer class="text-center text-gray-600 mt-10 text-xs">
-      Data stored locally in your browser — no database required
-    </footer>
-  </div>
+    <!-- ACTIVITY -->
+    <section id="activity" class="hidden-section fade-in">
+      <div class="card rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-bold text-lg">All Activity</h3>
+          <button id="btn-clear" class="btn-ghost px-4 py-2 rounded-lg text-sm">Clear All</button>
+        </div>
+        <div id="all-activity" class="space-y-3 max-h-[600px] overflow-y-auto pr-1">
+          <p class="text-gray-600 text-sm">No records.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="settings" class="hidden-section fade-in">
+      <div class="max-w-2xl space-y-6">
+        <div class="card rounded-2xl p-6">
+          <h3 class="font-bold text-lg mb-1">Backend Connection</h3>
+          <p class="text-gray-500 text-sm mb-6">Connect your Render backend API.</p>
+
+          <div class="space-y-5">
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">Backend URL</label>
+              <input type="url" id="setting-url" placeholder="https://instagram-auto-reply-api.onrender.com"
+                class="input w-full rounded-xl px-4 py-3 text-sm">
+              <p class="text-xs text-gray-600 mt-1.5">Your Render web service URL</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">API Key</label>
+              <input type="password" id="setting-key" placeholder="your-secret-api-key"
+                class="input w-full rounded-xl px-4 py-3 text-sm">
+              <p class="text-xs text-gray-600 mt-1.5">Same as your Render API_KEY env var</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">Default Reply Message</label>
+              <textarea id="setting-reply" rows="2" placeholder="Thanks for watching!"
+                class="input w-full rounded-xl px-4 py-3 text-sm resize-none"></textarea>
+            </div>
+
+            <button id="btn-save" class="btn-primary w-full py-3.5 rounded-xl font-semibold text-sm">Save Settings</button>
+            <div id="save-toast" class="hidden bg-green-500/10 border border-green-500/30 text-green-400 text-sm rounded-xl px-4 py-3 text-center font-medium">
+              Settings saved
+            </div>
+          </div>
+        </div>
+
+        <div class="card rounded-2xl p-6">
+          <h3 class="font-bold text-lg mb-4">Connection Guide</h3>
+          <ol class="space-y-3 text-sm text-gray-400 list-decimal list-inside">
+            <li>Deploy backend on Render using the GitHub repo.</li>
+            <li>Add env vars: IG_ACCESS_TOKEN, IG_USER_ID, API_KEY.</li>
+            <li>Copy your Render URL and API key here.</li>
+            <li>Click Run Now to test.</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+  </main>
 
   <script>
-    const STORAGE_KEY = 'ig_auto_reply_data';
-    const SETTINGS_KEY = 'ig_auto_reply_settings';
-
-    function loadData() {
-      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { entries: [], stats: { media: 0, comments: 0, replied: 0 } }; }
-      catch { return { entries: [], stats: { media: 0, comments: 0, replied: 0 } }; }
-    }
-
-    function saveData(data) {
-      data.entries = data.entries.slice(0, 50);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      render();
-    }
+    const DATA_KEY = 'ig_autoreply_data_v2';
+    const SETTINGS_KEY = 'ig_autoreply_settings_v2';
 
     function loadSettings() {
-      try { return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || { reply_message: 'Thanks for watching!', interval: 5, max_per_run: 50 }; }
-      catch { return { reply_message: 'Thanks for watching!', interval: 5, max_per_run: 50 }; }
+      try { return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {}; } catch { return {}; }
+    }
+    function saveSettings(s) { localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }
+    function loadData() {
+      try { return JSON.parse(localStorage.getItem(DATA_KEY)) || { entries: [], stats: { media: 0, comments: 0, replied: 0 } }; }
+      catch { return { entries: [], stats: { media: 0, comments: 0, replied: 0 } }; }
+    }
+    function saveData(d) {
+      d.entries = d.entries.slice(0, 200);
+      localStorage.setItem(DATA_KEY, JSON.stringify(d));
+      renderAll();
     }
 
-    function saveSettings(settings) {
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+    function showPage(page) {
+      document.querySelectorAll('section').forEach(s => {
+        s.classList.remove('visible-section');
+        s.classList.add('hidden-section');
+      });
+      document.getElementById(page).classList.remove('hidden-section');
+      document.getElementById(page).classList.add('visible-section');
+
+      document.querySelectorAll('.sidebar-item').forEach(a => a.classList.remove('active'));
+      document.querySelectorAll(`[data-page="${page}"]`).forEach(a => a.classList.add('active'));
+
+      const titles = { dashboard: ['Dashboard', 'Overview and stats'], run: ['Manual Run', 'Trigger replies manually'], activity: ['Activity', 'History of replies'], settings: ['Settings', 'Configure backend connection'] };
+      document.getElementById('page-title').textContent = titles[page][0];
+      document.getElementById('page-subtitle').textContent = titles[page][1];
+
+      document.getElementById('mobile-menu').classList.add('hidden');
     }
 
-    function escapeHtml(s) {
-      const d = document.createElement('div');
-      d.textContent = s;
-      return d.innerHTML;
-    }
+    document.querySelectorAll('.sidebar-item, [data-page]').forEach(el => {
+      el.addEventListener('click', (e) => { e.preventDefault(); showPage(el.dataset.page); });
+    });
 
-    function render() {
-      const data = loadData();
-      const settings = loadSettings();
+    document.getElementById('menu-toggle').addEventListener('click', () => {
+      document.getElementById('mobile-menu').classList.toggle('hidden');
+    });
 
-      document.getElementById('stat-media').textContent = data.stats.media;
-      document.getElementById('stat-comments').textContent = data.stats.comments;
-      document.getElementById('stat-replied').textContent = data.stats.replied;
-      document.getElementById('stat-interval').textContent = settings.interval;
-
-      document.getElementById('reply-msg').value = settings.reply_message;
-      document.getElementById('interval-input').value = settings.interval;
-      document.getElementById('max-input').value = settings.max_per_run;
-
-      const feed = document.getElementById('feed');
-
-      if (!data.entries.length) {
-        feed.innerHTML = `
-          <div class="text-center py-16">
-            <div class="text-gray-600 mb-3">
-              <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M20 13c0 4-3.5 7-8 7s-8-3-8-7M12 4v9m0 0l-3-3m3 3l3-3"/>
-              </svg>
-            </div>
-            <p class="text-gray-500 text-sm">No activity yet</p>
-            <p class="text-gray-600 text-xs mt-1">Run the backend to see replies here</p>
-          </div>`;
+    async function checkBackend() {
+      const s = loadSettings();
+      const dot = document.getElementById('status-dot');
+      const text = document.getElementById('status-text');
+      if (!s.backendUrl) {
+        dot.classList.add('off'); text.textContent = 'Not configured';
         return;
       }
-
-      feed.innerHTML = data.entries.map(e => `
-        <div class="card card-hover rounded-xl p-4 transition fade-in">
-          <div class="flex items-start justify-between gap-3">
-            <div class="flex items-center gap-3 min-w-0">
-              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-sm shrink-0">
-                ${escapeHtml(e.username.charAt(0).toUpperCase())}
-              </div>
-              <div class="min-w-0">
-                <div class="font-semibold text-sm truncate">@${escapeHtml(e.username)}</div>
-                <div class="text-gray-400 text-sm truncate">"${escapeHtml(e.comment)}"</div>
-              </div>
-            </div>
-            <div class="text-right shrink-0">
-              <div class="text-xs text-green-400 font-medium">Replied</div>
-              <div class="text-xs text-gray-600">${escapeHtml(e.time)}</div>
-            </div>
-          </div>
-          <div class="mt-3 bg-indigo-500/5 border border-indigo-500/20 rounded-lg px-3 py-2 text-sm text-indigo-200">
-            <span class="text-gray-600 mr-1">Reply:</span>${escapeHtml(e.reply)}
-          </div>
-        </div>
-      `).join('');
+      try {
+        const res = await fetch(s.backendUrl.replace(/\/$/, '') + '/health', { method: 'GET' });
+        if (res.ok) {
+          dot.classList.remove('off'); text.textContent = 'Connected';
+        } else {
+          dot.classList.add('off'); text.textContent = 'Error';
+        }
+      } catch {
+        dot.classList.add('off'); text.textContent = 'Offline';
+      }
     }
 
-    document.getElementById('save-btn').addEventListener('click', () => {
-      const settings = {
-        reply_message: document.getElementById('reply-msg').value.trim() || 'Thanks for watching!',
-        interval: parseInt(document.getElementById('interval-input').value) || 5,
-        max_per_run: parseInt(document.getElementById('max-input').value) || 50
+    function renderAll() {
+      const data = loadData();
+      const s = loadSettings();
+
+      document.getElementById('dash-media').textContent = data.stats.media;
+      document.getElementById('dash-comments').textContent = data.stats.comments;
+      document.getElementById('dash-replied').textContent = data.stats.replied;
+      document.getElementById('dash-reply').textContent = s.replyMessage || 'Not set';
+
+      document.getElementById('run-reply').value = s.replyMessage || '';
+      document.getElementById('run-max').value = s.maxComments || 50;
+
+      document.getElementById('setting-url').value = s.backendUrl || '';
+      document.getElementById('setting-key').value = s.apiKey || '';
+      document.getElementById('setting-reply').value = s.replyMessage || '';
+
+      const feed = (list, limit) => {
+        if (!list.length) return '<p class="text-gray-600 text-sm">No activity yet.</p>';
+        return list.slice(0, limit).map(e => `
+          <div class="card-hover card rounded-xl p-4 fade-in">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-sm shrink-0">
+                  ${e.username ? e.username.charAt(0).toUpperCase() : '?'}
+                </div>
+                <div class="min-w-0">
+                  <div class="font-semibold text-sm truncate">@${e.username || '?'}</div>
+                  <div class="text-gray-400 text-sm truncate">"${e.comment || ''}"</div>
+                </div>
+              </div>
+              <div class="text-right shrink-0">
+                <div class="text-xs text-green-400 font-medium">Replied</div>
+                <div class="text-xs text-gray-600">${e.time || ''}</div>
+              </div>
+            </div>
+            <div class="mt-3 bg-indigo-500/5 border border-indigo-500/20 rounded-lg px-3 py-2 text-sm text-indigo-200">
+              <span class="text-gray-600 mr-1">Reply:</span>${e.reply || ''}
+            </div>
+          </div>
+        `).join('');
       };
-      saveSettings(settings);
+
+      document.getElementById('dash-activity').innerHTML = feed(data.entries, 5);
+      document.getElementById('all-activity').innerHTML = feed(data.entries, 200);
+    }
+
+    document.getElementById('btn-save').addEventListener('click', () => {
+      const s = {
+        backendUrl: document.getElementById('setting-url').value.trim().replace(/\/$/, ''),
+        apiKey: document.getElementById('setting-key').value.trim(),
+        replyMessage: document.getElementById('setting-reply').value.trim() || 'Thanks for watching!',
+        maxComments: parseInt(document.getElementById('run-max').value) || 50
+      };
+      saveSettings(s);
       const toast = document.getElementById('save-toast');
       toast.classList.remove('hidden');
       setTimeout(() => toast.classList.add('hidden'), 2000);
-      render();
+      renderAll();
+      checkBackend();
     });
 
-    document.getElementById('clear-btn').addEventListener('click', () => {
-      localStorage.removeItem(STORAGE_KEY);
-      render();
-    });
+    document.getElementById('btn-run').addEventListener('click', async () => {
+      const s = loadSettings();
+      if (!s.backendUrl || !s.apiKey) {
+        alert('Backend URL and API key required. Go to Settings.');
+        showPage('settings');
+        return;
+      }
 
-    document.getElementById('add-test').addEventListener('click', () => {
-      const user = document.getElementById('test-user').value.trim();
-      const comment = document.getElementById('test-comment').value.trim();
-      if (!user || !comment) return;
-      const settings = loadSettings();
+      const btn = document.getElementById('btn-run');
+      const original = document.getElementById('run-text').textContent;
+      btn.disabled = true;
+      document.getElementById('run-text').textContent = 'Running...';
+
       const data = loadData();
-      data.entries.unshift({
-        username: user,
-        comment: comment,
-        reply: settings.reply_message,
-        time: new Date().toLocaleTimeString()
-      });
-      data.stats.comments++;
-      data.stats.replied++;
-      saveData(data);
-      document.getElementById('test-user').value = '';
-      document.getElementById('test-comment').value = '';
+      const repliedIds = data.entries.map(e => e.comment_id);
+
+      try {
+        const res = await fetch(s.backendUrl + '/run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-API-Key': s.apiKey },
+          body: JSON.stringify({
+            reply_message: document.getElementById('run-reply').value.trim() || s.replyMessage,
+            already_replied: repliedIds,
+            max_comments: parseInt(document.getElementById('run-max').value) || 50
+          })
+        });
+        const json = await res.json();
+
+        const box = document.getElementById('run-result');
+        box.classList.remove('hidden');
+
+        if (!res.ok || json.error) {
+          document.getElementById('run-status').textContent = 'Failed';
+          document.getElementById('run-detail').textContent = json.error || 'Unknown error';
+          document.getElementById('run-status').classList.replace('text-white', 'text-red-400');
+        } else {
+          document.getElementById('run-status').textContent = 'Success';
+          document.getElementById('run-status').classList.add('text-green-400');
+          document.getElementById('run-detail').textContent = `${json.replied.length} new replies sent. ${json.stats.comments_seen} comments checked.`;
+
+          const now = new Date().toLocaleTimeString();
+          json.replied.forEach(r => {
+            data.entries.unshift({
+              comment_id: r.comment_id,
+              username: r.username,
+              comment: r.comment,
+              reply: r.reply,
+              time: now
+            });
+          });
+          data.stats.media = Math.max(data.stats.media, json.stats.media);
+          data.stats.comments += json.stats.comments_seen;
+          data.stats.replied += json.replied.length;
+          saveData(data);
+        }
+      } catch (e) {
+        const box = document.getElementById('run-result');
+        box.classList.remove('hidden');
+        document.getElementById('run-status').textContent = 'Error';
+        document.getElementById('run-detail').textContent = e.message;
+      } finally {
+        btn.disabled = false;
+        document.getElementById('run-text').textContent = original;
+      }
     });
 
-    render();
+    document.getElementById('btn-clear').addEventListener('click', () => {
+      localStorage.removeItem(DATA_KEY);
+      renderAll();
+    });
+
+    renderAll();
+    checkBackend();
   </script>
 </body>
 </html>
