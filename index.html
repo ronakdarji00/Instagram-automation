@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Instagram Auto-Reply Dashboard</title>
+  <title>Instagram Auto-Reply & DM Automation</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
@@ -15,12 +15,14 @@
     .input:focus { border-color: #6366f1; outline: none; box-shadow: 0 0 0 3px rgba(99,102,241,0.18); }
     .btn-primary { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
     .btn-primary:hover { background: linear-gradient(135deg, #5356e3, #7c44e8); }
+    .btn-secondary { background: linear-gradient(135deg, #ec4899, #8b5cf6); }
+    .btn-secondary:hover { background: linear-gradient(135deg, #db2777, #7c3aed); }
     .btn-ghost { background: #161622; border: 1px solid #232334; }
     .btn-ghost:hover { background: #1f1f30; }
     .sidebar-item { color: #9ca3af; border-radius: 0.6rem; transition: all .15s ease; }
     .sidebar-item:hover, .sidebar-item.active { background: #1c1c2b; color: #ffffff; }
     .stat-num { font-weight: 800; letter-spacing: -0.02em; }
-    .fade-in { animation: fadeIn .3s ease-out; }
+    .fade-in { animation: fadeIn .25s ease-out; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
     .hidden-section { display: none; }
     .visible-section { display: block; }
@@ -31,6 +33,8 @@
     .dot-green { background: #22c55e; box-shadow: 0 0 10px #22c55e; }
     .dot-red { background: #ef4444; box-shadow: 0 0 10px #ef4444; }
     .dot-yellow { background: #eab308; box-shadow: 0 0 10px #eab308; }
+    .template-chip { cursor: pointer; transition: all .15s ease; }
+    .template-chip:hover { border-color: #6366f1; background: #1c1c2e; }
   </style>
 </head>
 <body class="min-h-screen flex">
@@ -44,7 +48,7 @@
         </div>
         <div>
           <span class="font-bold text-lg leading-tight block">AutoReply</span>
-          <span class="text-xs text-gray-500">Instagram Bot</span>
+          <span class="text-xs text-indigo-400 font-medium">Comments & DMs</span>
         </div>
       </div>
 
@@ -54,12 +58,16 @@
           Dashboard
         </a>
         <a href="#" data-page="run" class="sidebar-item flex items-center gap-3 px-4 py-3 text-sm font-medium">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          Manual Run
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+          Comments Auto-Reply
+        </a>
+        <a href="#" data-page="dms" class="sidebar-item flex items-center gap-3 px-4 py-3 text-sm font-medium">
+          <svg class="w-4 h-4 text-pink-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          Direct Messages (DMs)
         </a>
         <a href="#" data-page="activity" class="sidebar-item flex items-center gap-3 px-4 py-3 text-sm font-medium">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          Activity
+          Activity Log
         </a>
         <a href="#" data-page="settings" class="sidebar-item flex items-center gap-3 px-4 py-3 text-sm font-medium">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -68,8 +76,8 @@
       </nav>
     </div>
     <div class="text-xs text-gray-500 border-t border-[#1e1e2d] pt-4">
-      Backend & Instagram API Sync<br/>
-      <span class="text-gray-400">Personal Auto-Reply</span>
+      Instagram Automation Suite<br/>
+      <span class="text-gray-400">Comments & DM Auto-Responder</span>
     </div>
   </aside>
 
@@ -86,8 +94,9 @@
   <div id="mobile-menu" class="lg:hidden fixed top-14 left-0 w-full card border-x-0 border-t-0 hidden z-20 px-4 pb-4">
     <nav class="space-y-1">
       <a href="#" data-page="dashboard" class="sidebar-item active block px-4 py-3 text-sm">Dashboard</a>
-      <a href="#" data-page="run" class="sidebar-item block px-4 py-3 text-sm">Manual Run</a>
-      <a href="#" data-page="activity" class="sidebar-item block px-4 py-3 text-sm">Activity</a>
+      <a href="#" data-page="run" class="sidebar-item block px-4 py-3 text-sm">Comments Auto-Reply</a>
+      <a href="#" data-page="dms" class="sidebar-item block px-4 py-3 text-sm">Direct Messages (DMs)</a>
+      <a href="#" data-page="activity" class="sidebar-item block px-4 py-3 text-sm">Activity Log</a>
       <a href="#" data-page="settings" class="sidebar-item block px-4 py-3 text-sm">Settings & Status</a>
     </nav>
   </div>
@@ -99,7 +108,7 @@
     <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
       <div>
         <h1 id="page-title" class="text-2xl font-bold tracking-tight">Dashboard</h1>
-        <p id="page-subtitle" class="text-gray-400 text-sm mt-0.5">Overview, status and statistics</p>
+        <p id="page-subtitle" class="text-gray-400 text-sm mt-0.5">Live overview of auto-reply automation for Comments and DMs</p>
       </div>
       <div class="flex items-center flex-wrap gap-2.5">
         <!-- Backend Status Badge -->
@@ -121,7 +130,7 @@
       </div>
     </header>
 
-    <!-- Token Expired Alert Banner -->
+    <!-- Token Alert Banner -->
     <div id="token-alert-banner" class="hidden mb-6 card rounded-2xl p-4 md:p-5 border-l-4 border-l-red-500 bg-red-500/5">
       <div class="flex items-start justify-between gap-3">
         <div class="flex items-start gap-3 min-w-0">
@@ -131,7 +140,7 @@
           <div>
             <h4 class="font-semibold text-sm text-red-300">Action Required: Instagram Access Token Expired</h4>
             <p class="text-xs text-gray-400 mt-1 leading-relaxed" id="token-alert-msg">
-              Your Meta Graph API access token has expired. Automatic comment replies and fetching reels cannot work until you generate a new token.
+              Your Meta Graph API access token has expired. Automatic comment replies and DMs cannot work until you generate a new token.
             </p>
             <div class="mt-3 flex items-center gap-3">
               <button onclick="showPage('settings')" class="text-xs font-semibold text-indigo-400 hover:text-indigo-300 underline">
@@ -148,122 +157,218 @@
     <section id="dashboard" class="visible-section fade-in">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div class="card rounded-2xl p-5 card-hover">
-          <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-2">Media Tracked</div>
+          <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-2">Media Scanned</div>
           <div class="stat-num text-3xl" id="dash-media">0</div>
         </div>
         <div class="card rounded-2xl p-5 card-hover">
-          <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-2">Comments Seen</div>
-          <div class="stat-num text-3xl" id="dash-comments">0</div>
+          <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-2">Comments Replied</div>
+          <div class="stat-num text-3xl text-indigo-400" id="dash-replied">0</div>
         </div>
         <div class="card rounded-2xl p-5 card-hover">
-          <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-2">Replies Sent</div>
-          <div class="stat-num text-3xl text-green-400" id="dash-replied">0</div>
+          <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-2">DMs Replied</div>
+          <div class="stat-num text-3xl text-pink-400" id="dash-dms">0</div>
         </div>
         <div class="card rounded-2xl p-5 card-hover">
-          <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-2">Active Reply Text</div>
-          <div class="text-sm text-gray-300 truncate" id="dash-reply">Not set</div>
+          <div class="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-2">Active Comment Reply</div>
+          <div class="text-sm text-gray-300 truncate font-medium" id="dash-reply">Not set</div>
         </div>
       </div>
 
       <div class="grid lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 card rounded-2xl p-6">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="font-bold text-base">Recent Activity</h3>
+            <h3 class="font-bold text-base">Recent Automation Activity</h3>
             <button onclick="showPage('activity')" class="text-xs text-indigo-400 hover:underline">View All</button>
           </div>
           <div id="dash-activity" class="space-y-3 max-h-96 overflow-y-auto pr-1">
             <p class="text-gray-600 text-sm">No activity recorded yet.</p>
           </div>
         </div>
+
         <div class="card rounded-2xl p-6 flex flex-col justify-between">
           <div>
-            <h3 class="font-bold text-base mb-2">Quick Actions</h3>
-            <p class="text-xs text-gray-500 mb-5">Trigger a single run or test your connection settings.</p>
+            <h3 class="font-bold text-base mb-2">Quick Triggers</h3>
+            <p class="text-xs text-gray-500 mb-5">Launch comment automation or DM responder with one click.</p>
             <div class="space-y-3">
-              <button onclick="showPage('run')" class="btn-primary w-full py-3 rounded-xl font-semibold text-sm shadow-lg shadow-indigo-500/10">Run Auto-Reply Now</button>
-              <button onclick="showPage('settings')" class="btn-ghost w-full py-3 rounded-xl font-medium text-sm text-gray-300">Settings & Connection Test</button>
+              <button onclick="showPage('run')" class="btn-primary w-full py-3 rounded-xl font-semibold text-sm shadow-lg shadow-indigo-500/10 flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                Reply to Comments
+              </button>
+              <button onclick="showPage('dms')" class="btn-secondary w-full py-3 rounded-xl font-semibold text-sm shadow-lg shadow-pink-500/10 flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                Auto-Reply to DMs
+              </button>
+              <button onclick="showPage('settings')" class="btn-ghost w-full py-3 rounded-xl font-medium text-sm text-gray-300">
+                Change Default Messages & Settings
+              </button>
             </div>
           </div>
           <div class="mt-6 pt-5 border-t border-[#1e1e2d] text-xs text-gray-500 space-y-1">
-            <div>• Business Account: <span id="dash-uid" class="text-gray-300 font-mono">Loading...</span></div>
-            <div>• Token Status: <span id="dash-tok-status" class="text-gray-300">Checking...</span></div>
+            <div>• Active DM Message: <span id="dash-dm-reply" class="text-gray-300 truncate block mt-0.5">Hey! Thanks for messaging us 🙌</span></div>
+            <div>• Account ID: <span id="dash-uid" class="text-gray-300 font-mono">Loading...</span></div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- MANUAL RUN -->
+    <!-- COMMENTS AUTO-REPLY -->
     <section id="run" class="hidden-section fade-in">
-      <div class="max-w-2xl">
-        <div class="card rounded-2xl p-6 mb-6">
-          <h3 class="font-bold text-lg mb-1">Manual Auto-Reply Run</h3>
-          <p class="text-gray-400 text-sm mb-6">Triggers the backend once to check recent media and post template replies to new comments.</p>
+      <div class="max-w-3xl space-y-6">
+        <div class="card rounded-2xl p-6">
+          <div class="flex items-center justify-between mb-1">
+            <h3 class="font-bold text-lg">Comments Auto-Reply</h3>
+            <span class="text-xs px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-400 font-medium">Reels & Posts</span>
+          </div>
+          <p class="text-gray-400 text-sm mb-6">Inspect comments on your reels and automatically post your chosen reply message.</p>
 
           <div class="space-y-5">
+            <!-- Custom Reply Message Box -->
             <div>
-              <label class="block text-sm font-medium text-gray-300 mb-2">Reply Message Template</label>
+              <div class="flex items-center justify-between mb-2">
+                <label class="text-sm font-medium text-gray-300">Comment Reply Message</label>
+                <button id="btn-save-comment-reply" class="text-xs text-indigo-400 hover:text-indigo-300 font-medium">Save as Permanent Default</button>
+              </div>
               <textarea id="run-reply" rows="3" placeholder="Thanks for watching! 🙏"
                 class="input w-full rounded-xl px-4 py-3 text-sm resize-none"></textarea>
-              <p class="text-xs text-gray-500 mt-1.5">This exact text is posted in response to each newly detected comment.</p>
+              
+              <!-- Quick Template Chips -->
+              <div class="mt-2 flex flex-wrap gap-2 text-xs">
+                <span class="text-gray-500 py-1">Quick Templates:</span>
+                <button type="button" class="template-chip card px-2.5 py-1 rounded-lg text-gray-300" onclick="setCommentReply('Thanks for watching! 🙏')">"Thanks for watching! 🙏"</button>
+                <button type="button" class="template-chip card px-2.5 py-1 rounded-lg text-gray-300" onclick="setCommentReply('Check out link in bio for more details! ✨')">"Check link in bio! ✨"</button>
+                <button type="button" class="template-chip card px-2.5 py-1 rounded-lg text-gray-300" onclick="setCommentReply('Glad you liked it! Drop a DM for info. ❤️')">"Glad you liked it! ❤️"</button>
+                <button type="button" class="template-chip card px-2.5 py-1 rounded-lg text-gray-300" onclick="setCommentReply('DM sent! Check your message requests 📩')">"DM sent! 📩"</button>
+              </div>
             </div>
 
-            <div>
-              <label class="block text-sm font-medium text-gray-300 mb-2">Max Replies Per Run</label>
-              <input type="number" id="run-max" min="1" max="200" value="50"
-                class="input w-full rounded-xl px-4 py-3 text-sm">
-              <p class="text-xs text-gray-500 mt-1">Limits total replies sent in this single run to respect Instagram rate limits.</p>
-            </div>
-
-            <!-- Optional Token Override toggle -->
-            <div class="pt-2">
-              <details class="text-xs text-gray-400 cursor-pointer">
-                <summary class="font-medium text-indigo-400 hover:text-indigo-300 select-none">
-                  Advanced: Override Access Token for this run (Optional)
-                </summary>
-                <div class="mt-3 p-3 rounded-xl bg-[#0b0b14] border border-[#222234] space-y-2">
-                  <label class="block font-medium text-gray-300">Temporary Access Token</label>
-                  <input type="password" id="run-token-override" placeholder="Paste new token here if not yet updated in Render..."
-                    class="input w-full rounded-lg px-3 py-2 text-xs font-mono">
-                  <p class="text-[11px] text-gray-500">Useful to test a newly generated token immediately.</p>
+            <!-- Older Comments Feature Card -->
+            <div class="p-4 rounded-xl card border-indigo-500/30 bg-[#0d0d17] space-y-3">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-xs">
+                  ⚡
                 </div>
-              </details>
+                <h4 class="font-semibold text-sm text-gray-200">Older Comments & Deep Scan Options</h4>
+              </div>
+
+              <div class="space-y-3 text-xs pt-1">
+                <label class="flex items-start gap-3 cursor-pointer">
+                  <input type="checkbox" id="run-scan-older" class="mt-0.5 rounded border-gray-700 text-indigo-600 focus:ring-indigo-500">
+                  <div>
+                    <span class="font-medium text-gray-200">Deep Scan Older Posts & Comments</span>
+                    <p class="text-gray-400 mt-0.5">Paginates backwards through your past reels and fetches older comment threads instead of only the first page.</p>
+                  </div>
+                </label>
+
+                <label class="flex items-start gap-3 cursor-pointer">
+                  <input type="checkbox" id="run-force-reprocess" class="mt-0.5 rounded border-gray-700 text-indigo-600 focus:ring-indigo-500">
+                  <div>
+                    <span class="font-medium text-gray-200">Force Reply (Include previously replied comments)</span>
+                    <p class="text-gray-400 mt-0.5">Does not skip comments that were already processed in earlier runs.</p>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Max Comments To Reply</label>
+                <input type="number" id="run-max" min="1" max="200" value="50"
+                  class="input w-full rounded-xl px-4 py-3 text-sm">
+              </div>
+              <div class="flex items-end">
+                <button type="button" id="btn-reset-comment-cache" class="btn-ghost w-full py-3 rounded-xl text-xs text-yellow-400 hover:text-yellow-300 font-medium">
+                  Reset Reply History Cache
+                </button>
+              </div>
             </div>
 
             <button id="btn-run" class="btn-primary w-full py-3.5 rounded-xl font-semibold text-sm transition-all shadow-lg shadow-indigo-500/10">
-              <span id="run-text">Run Auto-Reply</span>
+              <span id="run-text">Run Comments Auto-Reply</span>
             </button>
 
             <!-- Result Box -->
             <div id="run-result" class="hidden card rounded-xl p-4 border-l-4 border-l-indigo-500">
-              <div class="flex items-start justify-between">
-                <div>
-                  <h4 class="font-semibold text-sm mb-1" id="run-status">Ready</h4>
-                  <p class="text-sm text-gray-400" id="run-detail">Click Run to start.</p>
-                </div>
-              </div>
-              <div id="run-error-fix" class="hidden mt-3 pt-3 border-t border-white/5">
-                <button onclick="showPage('settings')" class="text-xs font-semibold text-indigo-400 hover:text-indigo-300 underline">
-                  How to generate and update a new Instagram Token →
-                </button>
-              </div>
+              <h4 class="font-semibold text-sm mb-1" id="run-status">Ready</h4>
+              <p class="text-sm text-gray-400" id="run-detail">Click Run to start.</p>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ACTIVITY -->
+    <!-- DIRECT MESSAGES (DMs) AUTO-REPLY -->
+    <section id="dms" class="hidden-section fade-in">
+      <div class="max-w-3xl space-y-6">
+        <div class="card rounded-2xl p-6">
+          <div class="flex items-center justify-between mb-1">
+            <h3 class="font-bold text-lg">Direct Messages (DMs) Auto-Reply</h3>
+            <span class="text-xs px-2.5 py-1 rounded-full bg-pink-500/10 text-pink-400 font-medium">Instagram Inbox</span>
+          </div>
+          <p class="text-gray-400 text-sm mb-6">Scan your Instagram Direct Message inbox and automatically reply to new incoming messages.</p>
+
+          <div class="space-y-5">
+            <!-- Custom DM Reply Message -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <label class="text-sm font-medium text-gray-300">DM Auto-Response Message</label>
+                <button id="btn-save-dm-reply" class="text-xs text-pink-400 hover:text-pink-300 font-medium">Save as Permanent Default</button>
+              </div>
+              <textarea id="dm-reply-text" rows="3" placeholder="Hey! Thanks for messaging us 🙌 How can we help you today?"
+                class="input w-full rounded-xl px-4 py-3 text-sm resize-none"></textarea>
+              
+              <!-- Quick DM Template Chips -->
+              <div class="mt-2 flex flex-wrap gap-2 text-xs">
+                <span class="text-gray-500 py-1">Quick Templates:</span>
+                <button type="button" class="template-chip card px-2.5 py-1 rounded-lg text-gray-300" onclick="setDmReply('Hey! Thanks for messaging us 🙌 Check out our bio link!')">"Thanks for messaging 🙌"</button>
+                <button type="button" class="template-chip card px-2.5 py-1 rounded-lg text-gray-300" onclick="setDmReply('Hello! Thanks for reaching out. We will get back to you shortly ✨')">"Will reply shortly ✨"</button>
+                <button type="button" class="template-chip card px-2.5 py-1 rounded-lg text-gray-300" onclick="setDmReply('Hi! Here is the link to what you asked about: https://yourwebsite.com 🚀')">"Website link 🚀"</button>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">Max DMs To Process This Run</label>
+              <input type="number" id="dm-max" min="1" max="50" value="20"
+                class="input w-full rounded-xl px-4 py-3 text-sm">
+              <p class="text-xs text-gray-500 mt-1">Recommended 10-25 per run to stay well within Meta Messaging rate limits.</p>
+            </div>
+
+            <!-- Permission note -->
+            <div class="p-3.5 rounded-xl bg-pink-500/5 border border-pink-500/20 text-xs text-pink-200">
+              <span class="font-semibold text-pink-300">Note:</span> Instagram DMs require the <code class="text-pink-300">instagram_manage_messages</code> permission on your Meta App token.
+            </div>
+
+            <button id="btn-run-dms" class="btn-secondary w-full py-3.5 rounded-xl font-semibold text-sm transition-all shadow-lg shadow-pink-500/10">
+              <span id="run-dms-text">Run DMs Auto-Reply</span>
+            </button>
+
+            <!-- Result Box -->
+            <div id="dm-result" class="hidden card rounded-xl p-4 border-l-4 border-l-pink-500">
+              <h4 class="font-semibold text-sm mb-1" id="dm-status">Ready</h4>
+              <p class="text-sm text-gray-400" id="dm-detail">Click Run to process incoming DMs.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACTIVITY LOG -->
     <section id="activity" class="hidden-section fade-in">
       <div class="card rounded-2xl p-6">
-        <div class="flex items-center justify-between mb-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
           <div>
-            <h3 class="font-bold text-lg">All Reply Activity</h3>
-            <p class="text-xs text-gray-500">Stored locally in your browser session</p>
+            <h3 class="font-bold text-lg">Activity History</h3>
+            <p class="text-xs text-gray-500">All comments and DMs replied to by the system</p>
           </div>
-          <button id="btn-clear" class="btn-ghost px-4 py-2 rounded-xl text-xs text-red-400 hover:text-red-300 font-medium">Clear History</button>
+          <div class="flex items-center gap-2">
+            <!-- Filter buttons -->
+            <button id="filter-all" class="btn-ghost px-3 py-1.5 rounded-lg text-xs font-semibold text-white">All</button>
+            <button id="filter-comments" class="btn-ghost px-3 py-1.5 rounded-lg text-xs text-gray-400">Comments</button>
+            <button id="filter-dms" class="btn-ghost px-3 py-1.5 rounded-lg text-xs text-gray-400">DMs</button>
+            <button id="btn-clear" class="btn-ghost px-3 py-1.5 rounded-lg text-xs text-red-400 hover:text-red-300 font-medium ml-2">Clear History</button>
+          </div>
         </div>
         <div id="all-activity" class="space-y-3 max-h-[620px] overflow-y-auto pr-1">
-          <p class="text-gray-600 text-sm">No reply records found.</p>
+          <p class="text-gray-600 text-sm">No activity records found.</p>
         </div>
       </div>
     </section>
@@ -272,60 +377,73 @@
     <section id="settings" class="hidden-section fade-in">
       <div class="max-w-3xl space-y-6">
 
-        <!-- Connection Settings Card -->
+        <!-- Connection & Default Messages Card -->
         <div class="card rounded-2xl p-6">
           <div class="flex items-center justify-between mb-1">
-            <h3 class="font-bold text-lg">Backend API & Credentials</h3>
+            <h3 class="font-bold text-lg">Automation Settings</h3>
             <button id="btn-test-conn" class="btn-ghost text-xs px-3.5 py-1.5 rounded-lg text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1.5">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
               Test Connection & Token
             </button>
           </div>
-          <p class="text-gray-400 text-sm mb-6">Manage your Render backend endpoint and security keys.</p>
+          <p class="text-gray-400 text-sm mb-6">Configure backend URL, authentication, and permanent default reply messages.</p>
 
           <div class="space-y-5">
             <div>
               <label class="block text-sm font-medium text-gray-300 mb-2">Backend Web Service URL</label>
               <input type="url" id="setting-url" placeholder="https://instagram-automation-backend-f416.onrender.com"
                 class="input w-full rounded-xl px-4 py-3 text-sm font-mono text-xs">
-              <p class="text-xs text-gray-500 mt-1.5">The deployed Render service URL (or http://localhost:5000 for local test)</p>
+              <p class="text-xs text-gray-500 mt-1.5">Deployed Render URL or http://127.0.0.1:5000 for local development</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">
+                API Key <span class="text-xs text-gray-500 font-normal">(Optional)</span>
+              </label>
+              <input type="password" id="setting-key" placeholder="Leave blank if API_KEY not configured on Render"
+                class="input w-full rounded-xl px-4 py-3 text-sm">
+            </div>
+
+            <!-- Default Comment Reply -->
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">Default Comment Reply Message</label>
+              <textarea id="setting-reply" rows="2" placeholder="Thanks for watching! 🙏"
+                class="input w-full rounded-xl px-4 py-3 text-sm resize-none"></textarea>
+              <p class="text-xs text-gray-500 mt-1">Permanent default comment response saved to backend config.</p>
+            </div>
+
+            <!-- Default DM Reply -->
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">Default Direct Message (DM) Reply Message</label>
+              <textarea id="setting-dm-reply" rows="2" placeholder="Hey! Thanks for messaging us 🙌"
+                class="input w-full rounded-xl px-4 py-3 text-sm resize-none"></textarea>
+              <p class="text-xs text-gray-500 mt-1">Permanent default response for incoming Instagram DMs.</p>
             </div>
 
             <div class="grid md:grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">
-                  API Key <span class="text-xs text-gray-500 font-normal">(Optional)</span>
-                </label>
-                <input type="password" id="setting-key" placeholder="Leave blank if API_KEY not set on Render"
-                  class="input w-full rounded-xl px-4 py-3 text-sm">
-                <p class="text-xs text-gray-500 mt-1.5">Only needed if `API_KEY` env var is configured</p>
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">Max Replies Per Run</label>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Max Comments Per Run</label>
                 <input type="number" id="setting-max" min="1" max="200" value="50"
                   class="input w-full rounded-xl px-4 py-3 text-sm">
-                <p class="text-xs text-gray-500 mt-1.5">Default limit per execution</p>
               </div>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-300 mb-2">Default Reply Message</label>
-              <textarea id="setting-reply" rows="2" placeholder="Thanks for watching! 🙏"
-                class="input w-full rounded-xl px-4 py-3 text-sm resize-none"></textarea>
+              <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Max DMs Per Run</label>
+                <input type="number" id="setting-max-dms" min="1" max="50" value="20"
+                  class="input w-full rounded-xl px-4 py-3 text-sm">
+              </div>
             </div>
 
             <!-- Test Connection Result Area -->
             <div id="test-result-box" class="hidden p-4 rounded-xl border text-xs"></div>
 
-            <button id="btn-save" class="btn-primary w-full py-3.5 rounded-xl font-semibold text-sm">Save Settings</button>
+            <button id="btn-save" class="btn-primary w-full py-3.5 rounded-xl font-semibold text-sm">Save All Settings (Syncs to Backend)</button>
             <div id="save-toast" class="hidden bg-green-500/10 border border-green-500/30 text-green-400 text-sm rounded-xl px-4 py-3 text-center font-medium">
-              Settings saved successfully!
+              Settings & Reply Messages successfully saved!
             </div>
           </div>
         </div>
 
-        <!-- How to Fix Expired Token Guide -->
+        <!-- Meta Token Renewal Guide -->
         <div class="card rounded-2xl p-6 border-indigo-500/30">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-sm">
@@ -333,11 +451,11 @@
             </div>
             <div>
               <h3 class="font-bold text-base">Meta Token Renewal Guide</h3>
-              <p class="text-xs text-gray-500">Instagram tokens expire every 60 days. Follow these steps to generate a new one:</p>
+              <p class="text-xs text-gray-500">Instagram tokens expire every 60 days. Follow these steps to generate a fresh token:</p>
             </div>
           </div>
 
-          <div class="space-y-4 text-xs text-gray-300 mt-4 leading-relaxed">
+          <div class="space-y-3.5 text-xs text-gray-300 mt-4 leading-relaxed">
             <div class="flex gap-3 items-start p-3 rounded-xl bg-[#0c0c16] border border-[#1e1e2d]">
               <span class="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold shrink-0">1</span>
               <div>
@@ -349,8 +467,8 @@
             <div class="flex gap-3 items-start p-3 rounded-xl bg-[#0c0c16] border border-[#1e1e2d]">
               <span class="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold shrink-0">2</span>
               <div>
-                <p class="font-medium text-gray-200">Select Permissions</p>
-                <p class="text-gray-400 mt-0.5">Under "User or Page", select your User Token or Page Token. Ensure permissions include <code class="text-indigo-300">instagram_basic</code>, <code class="text-indigo-300">instagram_manage_comments</code>, and <code class="text-indigo-300">pages_show_list</code>.</p>
+                <p class="font-medium text-gray-200">Select Permissions (Comments & DMs)</p>
+                <p class="text-gray-400 mt-0.5">Select User/Page Token and add: <code class="text-indigo-300">instagram_basic</code>, <code class="text-indigo-300">instagram_manage_comments</code>, <code class="text-pink-300">instagram_manage_messages</code>, and <code class="text-indigo-300">pages_show_list</code>.</p>
               </div>
             </div>
 
@@ -358,15 +476,15 @@
               <span class="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold shrink-0">3</span>
               <div>
                 <p class="font-medium text-gray-200">Extend to 60-Day Long-Lived Token</p>
-                <p class="text-gray-400 mt-0.5">Click "Generate Access Token", then copy it to the <a href="https://developers.facebook.com/tools/debug/accesstoken/" target="_blank" class="text-indigo-400 underline">Access Token Debugger</a> and click "Extend Access Token".</p>
+                <p class="text-gray-400 mt-0.5">Generate token, copy it into <a href="https://developers.facebook.com/tools/debug/accesstoken/" target="_blank" class="text-indigo-400 underline">Access Token Debugger</a> and click "Extend Access Token".</p>
               </div>
             </div>
 
             <div class="flex gap-3 items-start p-3 rounded-xl bg-[#0c0c16] border border-[#1e1e2d]">
               <span class="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold shrink-0">4</span>
               <div>
-                <p class="font-medium text-gray-200">Update Render Environment Variables</p>
-                <p class="text-gray-400 mt-0.5">Go to your Render Dashboard → Service <code class="text-gray-300">instagram-automation-backend</code> → Environment → Edit <code class="text-indigo-300">IG_ACCESS_TOKEN</code> and paste the new token.</p>
+                <p class="font-medium text-gray-200">Update Render Environment</p>
+                <p class="text-gray-400 mt-0.5">Render Dashboard → <code class="text-gray-300">instagram-automation-backend</code> → Environment → Edit <code class="text-indigo-300">IG_ACCESS_TOKEN</code> and paste the new token.</p>
               </div>
             </div>
           </div>
@@ -378,9 +496,11 @@
   </main>
 
   <script>
-    const DATA_KEY = 'ig_autoreply_data_v2';
-    const SETTINGS_KEY = 'ig_autoreply_settings_v2';
-    const DEFAULT_BACKEND_URL = 'https://instagram-automation-backend-f416.onrender.com';
+    const DATA_KEY = 'ig_autoreply_data_v3';
+    const SETTINGS_KEY = 'ig_autoreply_settings_v3';
+    const DEFAULT_BACKEND_URL = 'http://127.0.0.1:5000';
+
+    let currentActivityFilter = 'all';
 
     function loadSettings() {
       let s = {};
@@ -389,7 +509,9 @@
         backendUrl: s.backendUrl || DEFAULT_BACKEND_URL,
         apiKey: s.apiKey || '',
         replyMessage: s.replyMessage || 'Thanks for watching! 🙏',
-        maxComments: s.maxComments || 50
+        dmReplyMessage: s.dmReplyMessage || 'Hey! Thanks for messaging us 🙌',
+        maxComments: s.maxComments || 50,
+        maxDms: s.maxDms || 20
       };
     }
 
@@ -399,14 +521,14 @@
 
     function loadData() {
       try {
-        return JSON.parse(localStorage.getItem(DATA_KEY)) || { entries: [], stats: { media: 0, comments: 0, replied: 0 } };
+        return JSON.parse(localStorage.getItem(DATA_KEY)) || { entries: [], stats: { media: 0, comments: 0, replied: 0, dms: 0 } };
       } catch {
-        return { entries: [], stats: { media: 0, comments: 0, replied: 0 } };
+        return { entries: [], stats: { media: 0, comments: 0, replied: 0, dms: 0 } };
       }
     }
 
     function saveData(d) {
-      d.entries = (d.entries || []).slice(0, 300);
+      d.entries = (d.entries || []).slice(0, 400);
       localStorage.setItem(DATA_KEY, JSON.stringify(d));
       renderAll();
     }
@@ -426,10 +548,11 @@
       document.querySelectorAll(`[data-page="${page}"]`).forEach(a => a.classList.add('active'));
 
       const titles = {
-        dashboard: ['Dashboard', 'Overview, status and statistics'],
-        run: ['Manual Run', 'Trigger auto-replies to recent comments'],
-        activity: ['Activity History', 'Log of all comments replied to'],
-        settings: ['Settings & Status', 'Configure backend connection and inspect token health']
+        dashboard: ['Dashboard', 'Live overview of auto-reply automation for Comments and DMs'],
+        run: ['Comments Auto-Reply', 'Reply to comments on your reels, with deep scan for older comments'],
+        dms: ['Direct Messages (DMs)', 'Automated auto-reply for incoming Instagram direct messages'],
+        activity: ['Activity History', 'Complete log of all comments and DMs replied to'],
+        settings: ['Settings & Status', 'Configure backend connection, default reply messages, and token status']
       };
       if (titles[page]) {
         document.getElementById('page-title').textContent = titles[page][0];
@@ -449,6 +572,14 @@
     document.getElementById('menu-toggle').addEventListener('click', () => {
       document.getElementById('mobile-menu').classList.toggle('hidden');
     });
+
+    function setCommentReply(text) {
+      document.getElementById('run-reply').value = text;
+    }
+
+    function setDmReply(text) {
+      document.getElementById('dm-reply-text').value = text;
+    }
 
     // Check backend health & Meta token validity
     async function checkBackendAndToken() {
@@ -477,7 +608,7 @@
         headers['X-API-Key'] = s.apiKey;
       }
 
-      // Step 1: Health check
+      // 1. Health check
       try {
         const res = await fetch(cleanUrl + '/health', { method: 'GET' });
         if (res.ok) {
@@ -498,16 +629,24 @@
         return;
       }
 
-      // Step 2: Settings check
+      // 2. Fetch backend settings to sync reply messages
       try {
         const sRes = await fetch(cleanUrl + '/settings', { method: 'GET', headers });
         if (sRes.ok) {
           const sJson = await sRes.json();
           document.getElementById('dash-uid').textContent = sJson.ig_user_id || 'Not set';
+          if (sJson.default_reply_message) {
+            s.replyMessage = sJson.default_reply_message;
+          }
+          if (sJson.default_dm_reply_message) {
+            s.dmReplyMessage = sJson.default_dm_reply_message;
+          }
+          saveSettings(s);
+          renderAll();
         }
       } catch (_) {}
 
-      // Step 3: Verify Meta Token
+      // 3. Verify Meta Token
       try {
         const vRes = await fetch(cleanUrl + '/verify', { method: 'GET', headers });
         const vText = await vRes.text();
@@ -518,7 +657,6 @@
           igDot.className = 'status-dot dot-green';
           igText.textContent = vJson.account?.username ? `@${vJson.account.username}` : 'Valid';
           document.getElementById('token-alert-banner').classList.add('hidden');
-          document.getElementById('dash-tok-status').innerHTML = '<span class="text-green-400">● Active</span>';
         } else {
           igDot.className = 'status-dot dot-red';
           igText.textContent = 'Expired';
@@ -526,7 +664,6 @@
           if (vJson.error) {
             document.getElementById('token-alert-msg').textContent = vJson.error;
           }
-          document.getElementById('dash-tok-status').innerHTML = '<span class="text-red-400">● Expired / Invalid</span>';
         }
       } catch (err) {
         igDot.className = 'status-dot dot-yellow';
@@ -573,15 +710,15 @@
         } else {
           resultBox.className = 'p-4 rounded-xl border text-xs bg-red-500/10 border-red-500/30 text-red-300';
           resultBox.innerHTML = `
-            <strong>Instagram Token Issue Detected:</strong><br/>
+            <strong>Instagram Token Issue:</strong><br/>
             <p class="mt-1 font-mono">${vJson.error || 'Token expired or permission denied.'}</p>
-            <p class="mt-2 text-gray-300">See the Renewal Guide below to generate a new 60-day token.</p>
+            <p class="mt-2 text-gray-300">See the Renewal Guide below to extend your token.</p>
           `;
           checkBackendAndToken();
         }
       } catch (err) {
         resultBox.className = 'p-4 rounded-xl border text-xs bg-red-500/10 border-red-500/30 text-red-300';
-        resultBox.innerHTML = `<strong>Connection Failed:</strong> ${err.message}. Is your Render backend awake?`;
+        resultBox.innerHTML = `<strong>Connection Failed:</strong> ${err.message}.`;
       }
     });
 
@@ -590,57 +727,136 @@
       const s = loadSettings();
 
       document.getElementById('dash-media').textContent = data.stats?.media || 0;
-      document.getElementById('dash-comments').textContent = data.stats?.comments || 0;
       document.getElementById('dash-replied').textContent = data.stats?.replied || 0;
+      document.getElementById('dash-dms').textContent = data.stats?.dms || 0;
       document.getElementById('dash-reply').textContent = s.replyMessage || 'Not set';
+      document.getElementById('dash-dm-reply').textContent = s.dmReplyMessage || 'Not set';
 
       document.getElementById('run-reply').value = s.replyMessage || '';
+      document.getElementById('dm-reply-text').value = s.dmReplyMessage || '';
       document.getElementById('run-max').value = s.maxComments || 50;
+      document.getElementById('dm-max').value = s.maxDms || 20;
 
       document.getElementById('setting-url').value = s.backendUrl || '';
       document.getElementById('setting-key').value = s.apiKey || '';
-      document.getElementById('setting-max').value = s.maxComments || 50;
       document.getElementById('setting-reply').value = s.replyMessage || '';
+      document.getElementById('setting-dm-reply').value = s.dmReplyMessage || '';
+      document.getElementById('setting-max').value = s.maxComments || 50;
+      document.getElementById('setting-max-dms').value = s.maxDms || 20;
 
-      const feed = (list, limit) => {
-        if (!list || !list.length) return '<p class="text-gray-600 text-sm">No reply history yet.</p>';
-        return list.slice(0, limit).map(e => `
-          <div class="card-hover card rounded-xl p-4 fade-in">
-            <div class="flex items-start justify-between gap-3">
-              <div class="flex items-center gap-3 min-w-0">
-                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-sm shrink-0 text-white">
-                  ${e.username ? e.username.charAt(0).toUpperCase() : '?'}
-                </div>
-                <div class="min-w-0">
-                  <div class="font-semibold text-sm truncate text-white">@${e.username || '?'}</div>
-                  <div class="text-gray-400 text-xs truncate mt-0.5">"${e.comment || ''}"</div>
-                </div>
-              </div>
-              <div class="text-right shrink-0">
-                <div class="text-[11px] text-green-400 font-semibold px-2 py-0.5 rounded-full bg-green-500/10 inline-block">Replied</div>
-                <div class="text-[11px] text-gray-500 mt-1">${e.time || ''}</div>
-              </div>
-            </div>
-            <div class="mt-3 bg-indigo-500/5 border border-indigo-500/20 rounded-lg px-3 py-2 text-xs text-indigo-200">
-              <span class="text-gray-500 mr-1.5 font-medium">Reply:</span>${e.reply || ''}
-            </div>
-          </div>
-        `).join('');
-      };
-
-      document.getElementById('dash-activity').innerHTML = feed(data.entries, 5);
-      document.getElementById('all-activity').innerHTML = feed(data.entries, 200);
+      renderActivityFeed(data.entries);
     }
 
-    // Save Settings
-    document.getElementById('btn-save').addEventListener('click', () => {
+    function renderActivityFeed(entries) {
+      const list = entries || [];
+      const filtered = list.filter(e => {
+        if (currentActivityFilter === 'comments') return e.type === 'comment' || !e.type;
+        if (currentActivityFilter === 'dms') return e.type === 'dm';
+        return true;
+      });
+
+      const feedHtml = (items, limit) => {
+        if (!items || !items.length) return '<p class="text-gray-600 text-sm">No activity records found.</p>';
+        return items.slice(0, limit).map(e => {
+          const isDm = e.type === 'dm';
+          const badgeClass = isDm ? 'bg-pink-500/10 text-pink-400 border border-pink-500/20' : 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20';
+          const avatarGradient = isDm ? 'from-pink-500 to-rose-600' : 'from-indigo-500 to-purple-600';
+          const badgeText = isDm ? 'Direct Message' : 'Comment Reply';
+
+          return `
+            <div class="card-hover card rounded-xl p-4 fade-in">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="w-9 h-9 rounded-full bg-gradient-to-br ${avatarGradient} flex items-center justify-center font-bold text-sm shrink-0 text-white">
+                    ${e.username ? e.username.charAt(0).toUpperCase() : '?'}
+                  </div>
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-2">
+                      <span class="font-semibold text-sm truncate text-white">@${e.username || '?'}</span>
+                      <span class="text-[10px] px-2 py-0.2 rounded-full ${badgeClass}">${badgeText}</span>
+                    </div>
+                    <div class="text-gray-400 text-xs truncate mt-0.5">"${e.comment || e.message || ''}"</div>
+                  </div>
+                </div>
+                <div class="text-right shrink-0">
+                  <div class="text-[11px] text-green-400 font-semibold px-2 py-0.5 rounded-full bg-green-500/10 inline-block">Sent ✓</div>
+                  <div class="text-[11px] text-gray-500 mt-1">${e.time || ''}</div>
+                </div>
+              </div>
+              <div class="mt-3 bg-[#0a0a14] border border-[#222234] rounded-lg px-3 py-2 text-xs text-indigo-200">
+                <span class="text-gray-500 mr-1.5 font-medium">Replied:</span>${e.reply || ''}
+              </div>
+            </div>
+          `;
+        }).join('');
+      };
+
+      document.getElementById('dash-activity').innerHTML = feedHtml(list, 5);
+      document.getElementById('all-activity').innerHTML = feedHtml(filtered, 250);
+    }
+
+    // Filter Buttons
+    document.getElementById('filter-all').addEventListener('click', () => {
+      currentActivityFilter = 'all';
+      updateFilterButtons('filter-all');
+      renderAll();
+    });
+    document.getElementById('filter-comments').addEventListener('click', () => {
+      currentActivityFilter = 'comments';
+      updateFilterButtons('filter-comments');
+      renderAll();
+    });
+    document.getElementById('filter-dms').addEventListener('click', () => {
+      currentActivityFilter = 'dms';
+      updateFilterButtons('filter-dms');
+      renderAll();
+    });
+
+    function updateFilterButtons(activeId) {
+      ['filter-all', 'filter-comments', 'filter-dms'].forEach(id => {
+        const el = document.getElementById(id);
+        if (id === activeId) {
+          el.className = 'btn-ghost px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-[#222235]';
+        } else {
+          el.className = 'btn-ghost px-3 py-1.5 rounded-lg text-xs text-gray-400';
+        }
+      });
+    }
+
+    // Save All Settings & Sync to Backend
+    async function syncSettingsToBackend(updates) {
+      const s = loadSettings();
+      const cleanUrl = s.backendUrl.replace(/\/$/, '');
+      const headers = { 'Content-Type': 'application/json' };
+      if (s.apiKey) headers['X-API-Key'] = s.apiKey;
+
+      try {
+        await fetch(cleanUrl + '/settings', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(updates)
+        });
+      } catch (_) {}
+    }
+
+    document.getElementById('btn-save').addEventListener('click', async () => {
       const s = {
         backendUrl: document.getElementById('setting-url').value.trim().replace(/\/$/, ''),
         apiKey: document.getElementById('setting-key').value.trim(),
         replyMessage: document.getElementById('setting-reply').value.trim() || 'Thanks for watching! 🙏',
-        maxComments: parseInt(document.getElementById('setting-max').value) || 50
+        dmReplyMessage: document.getElementById('setting-dm-reply').value.trim() || 'Hey! Thanks for messaging us 🙌',
+        maxComments: parseInt(document.getElementById('setting-max').value) || 50,
+        maxDms: parseInt(document.getElementById('setting-max-dms').value) || 20
       };
       saveSettings(s);
+
+      await syncSettingsToBackend({
+        reply_message: s.replyMessage,
+        dm_reply_message: s.dmReplyMessage,
+        max_comments: s.maxComments,
+        max_dms: s.maxDms
+      });
+
       const toast = document.getElementById('save-toast');
       toast.classList.remove('hidden');
       setTimeout(() => toast.classList.add('hidden'), 2500);
@@ -648,11 +864,51 @@
       checkBackendAndToken();
     });
 
-    // Run Auto-Reply
+    // Save comment reply directly from Comments tab
+    document.getElementById('btn-save-comment-reply').addEventListener('click', async () => {
+      const s = loadSettings();
+      const newReply = document.getElementById('run-reply').value.trim();
+      if (!newReply) return;
+      s.replyMessage = newReply;
+      saveSettings(s);
+      await syncSettingsToBackend({ reply_message: newReply });
+      alert('Permanent Comment Reply Template Saved!');
+      renderAll();
+    });
+
+    // Save DM reply directly from DMs tab
+    document.getElementById('btn-save-dm-reply').addEventListener('click', async () => {
+      const s = loadSettings();
+      const newDmReply = document.getElementById('dm-reply-text').value.trim();
+      if (!newDmReply) return;
+      s.dmReplyMessage = newDmReply;
+      saveSettings(s);
+      await syncSettingsToBackend({ dm_reply_message: newDmReply });
+      alert('Permanent Direct Message (DM) Reply Template Saved!');
+      renderAll();
+    });
+
+    // Reset Comment Cache
+    document.getElementById('btn-reset-comment-cache').addEventListener('click', async () => {
+      if (confirm('Reset comment history cache? The system will be able to reply to older comments again.')) {
+        const s = loadSettings();
+        const cleanUrl = s.backendUrl.replace(/\/$/, '');
+        const headers = { 'Content-Type': 'application/json' };
+        if (s.apiKey) headers['X-API-Key'] = s.apiKey;
+        try {
+          await fetch(cleanUrl + '/reset-history', { method: 'POST', headers, body: JSON.stringify({ target: 'comments' }) });
+          alert('Comment history cache successfully reset!');
+        } catch (e) {
+          alert('Failed to reset backend cache: ' + e.message);
+        }
+      }
+    });
+
+    // RUN COMMENTS AUTO-REPLY
     document.getElementById('btn-run').addEventListener('click', async () => {
       const s = loadSettings();
       if (!s.backendUrl) {
-        alert('Backend URL is required. Please configure it in Settings.');
+        alert('Backend URL is required. Please set it in Settings.');
         showPage('settings');
         return;
       }
@@ -661,33 +917,29 @@
       const textSpan = document.getElementById('run-text');
       const originalText = textSpan.textContent;
       btn.disabled = true;
-      textSpan.textContent = 'Running auto-reply...';
+      textSpan.textContent = 'Processing comments...';
 
       const data = loadData();
-      const repliedIds = (data.entries || []).map(e => e.comment_id);
-      const tokenOverride = document.getElementById('run-token-override')?.value.trim();
+      const repliedIds = (data.entries || []).filter(e => e.type !== 'dm').map(e => e.comment_id);
+      const scanOlder = document.getElementById('run-scan-older').checked;
+      const forceReprocess = document.getElementById('run-force-reprocess').checked;
 
       const payload = {
         reply_message: document.getElementById('run-reply').value.trim() || s.replyMessage,
         already_replied: repliedIds,
-        max_comments: parseInt(document.getElementById('run-max').value) || 50
+        max_comments: parseInt(document.getElementById('run-max').value) || 50,
+        scan_older: scanOlder,
+        force_reprocess: forceReprocess
       };
-      if (tokenOverride) {
-        payload.access_token = tokenOverride;
-      }
 
       const headers = { 'Content-Type': 'application/json' };
-      if (s.apiKey) {
-        headers['X-API-Key'] = s.apiKey;
-      }
+      if (s.apiKey) headers['X-API-Key'] = s.apiKey;
 
       const box = document.getElementById('run-result');
       const statusEl = document.getElementById('run-status');
       const detailEl = document.getElementById('run-detail');
-      const fixEl = document.getElementById('run-error-fix');
 
       box.classList.remove('hidden');
-      fixEl.classList.add('hidden');
 
       try {
         const res = await fetch(s.backendUrl.replace(/\/$/, '') + '/run', {
@@ -698,32 +950,25 @@
 
         const rawText = await res.text();
         let json = {};
-        try {
-          json = JSON.parse(rawText);
-        } catch {
+        try { json = JSON.parse(rawText); } catch {
           json = { error: `Server response (${res.status}): ${rawText.slice(0, 200)}` };
         }
 
         if (!res.ok || json.error) {
           box.className = 'card rounded-xl p-4 border-l-4 border-l-red-500 bg-red-500/5';
           statusEl.className = 'font-semibold text-sm mb-1 text-red-400';
-          statusEl.textContent = 'Run Failed';
+          statusEl.textContent = 'Comments Run Failed';
           detailEl.textContent = json.error || 'Unknown error occurred.';
-
-          if ((json.error || '').toLowerCase().includes('token') || (json.error || '').toLowerCase().includes('expired')) {
-            fixEl.classList.remove('hidden');
-            document.getElementById('token-alert-banner').classList.remove('hidden');
-            document.getElementById('token-alert-msg').textContent = json.error;
-          }
         } else {
           box.className = 'card rounded-xl p-4 border-l-4 border-l-green-500 bg-green-500/5';
           statusEl.className = 'font-semibold text-sm mb-1 text-green-400';
-          statusEl.textContent = 'Run Completed Successfully';
-          detailEl.textContent = `${json.replied.length} comments replied to. ${json.stats.comments_seen} new comments inspected across ${json.stats.media} reels.`;
+          statusEl.textContent = 'Comments Run Completed';
+          detailEl.textContent = `${json.replied.length} new comments replied to across ${json.stats.media} reels (${json.stats.comments_seen} checked). Deep scan: ${json.stats.deep_scan ? 'Enabled' : 'Disabled'}.`;
 
           const now = new Date().toLocaleTimeString();
           json.replied.forEach(r => {
             data.entries.unshift({
+              type: 'comment',
               comment_id: r.comment_id,
               username: r.username,
               comment: r.comment,
@@ -739,8 +984,91 @@
       } catch (e) {
         box.className = 'card rounded-xl p-4 border-l-4 border-l-red-500 bg-red-500/5';
         statusEl.className = 'font-semibold text-sm mb-1 text-red-400';
-        statusEl.textContent = 'Network / Server Error';
-        detailEl.textContent = `${e.message}. Render free instances may be waking up from sleep.`;
+        statusEl.textContent = 'Network Error';
+        detailEl.textContent = e.message;
+      } finally {
+        btn.disabled = false;
+        textSpan.textContent = originalText;
+      }
+    });
+
+    // RUN DIRECT MESSAGES (DMs) AUTO-REPLY
+    document.getElementById('btn-run-dms').addEventListener('click', async () => {
+      const s = loadSettings();
+      if (!s.backendUrl) {
+        alert('Backend URL is required. Please set it in Settings.');
+        showPage('settings');
+        return;
+      }
+
+      const btn = document.getElementById('btn-run-dms');
+      const textSpan = document.getElementById('run-dms-text');
+      const originalText = textSpan.textContent;
+      btn.disabled = true;
+      textSpan.textContent = 'Checking inbox & replying...';
+
+      const data = loadData();
+      const repliedDmIds = (data.entries || []).filter(e => e.type === 'dm').map(e => e.message_id);
+
+      const payload = {
+        dm_reply_message: document.getElementById('dm-reply-text').value.trim() || s.dmReplyMessage,
+        already_replied_dms: repliedDmIds,
+        max_dms: parseInt(document.getElementById('dm-max').value) || 20
+      };
+
+      const headers = { 'Content-Type': 'application/json' };
+      if (s.apiKey) headers['X-API-Key'] = s.apiKey;
+
+      const box = document.getElementById('dm-result');
+      const statusEl = document.getElementById('dm-status');
+      const detailEl = document.getElementById('dm-detail');
+
+      box.classList.remove('hidden');
+
+      try {
+        const res = await fetch(s.backendUrl.replace(/\/$/, '') + '/run-dms', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(payload)
+        });
+
+        const rawText = await res.text();
+        let json = {};
+        try { json = JSON.parse(rawText); } catch {
+          json = { error: `Server response (${res.status}): ${rawText.slice(0, 200)}` };
+        }
+
+        if (!res.ok || json.error) {
+          box.className = 'card rounded-xl p-4 border-l-4 border-l-red-500 bg-red-500/5';
+          statusEl.className = 'font-semibold text-sm mb-1 text-red-400';
+          statusEl.textContent = 'DMs Run Failed';
+          detailEl.textContent = json.error || 'Failed to check or reply to DMs.';
+        } else {
+          box.className = 'card rounded-xl p-4 border-l-4 border-l-pink-500 bg-pink-500/5';
+          statusEl.className = 'font-semibold text-sm mb-1 text-pink-400';
+          statusEl.textContent = 'DMs Run Completed';
+          detailEl.textContent = `${json.replied.length} Direct Messages replied to (${json.stats.conversations_seen} conversations scanned).`;
+
+          const now = new Date().toLocaleTimeString();
+          json.replied.forEach(r => {
+            data.entries.unshift({
+              type: 'dm',
+              message_id: r.message_id,
+              conversation_id: r.conversation_id,
+              username: r.username,
+              message: r.message,
+              reply: r.reply,
+              time: now
+            });
+          });
+          data.stats.dms = (data.stats.dms || 0) + json.replied.length;
+          saveData(data);
+        }
+      } catch (e) {
+        box.className = 'card rounded-xl p-4 border-l-4 border-l-red-500 bg-red-500/5';
+        statusEl.className = 'font-semibold text-sm mb-1 text-red-400';
+        statusEl.textContent = 'Network Error';
+        detailEl.textContent = e.message;
       } finally {
         btn.disabled = false;
         textSpan.textContent = originalText;
@@ -748,13 +1076,12 @@
     });
 
     document.getElementById('btn-clear').addEventListener('click', () => {
-      if (confirm('Are you sure you want to clear your local reply history?')) {
+      if (confirm('Clear entire local reply history?')) {
         localStorage.removeItem(DATA_KEY);
         renderAll();
       }
     });
 
-    // Initial render & background check
     renderAll();
     checkBackendAndToken();
   </script>
